@@ -1,2 +1,2 @@
-# multisite_taxonomies
-Wordpress multisite taxonomies
+# Wordpress multisite taxonomies
+
