@@ -21,3 +21,13 @@ define('MST_PLUGIN_DIR', untrailingslashit(dirname(MST_PLUGIN)));
 
 include MST_PLUGIN_DIR . '/admin/init.php';
 include MST_PLUGIN_DIR . '/taxonomies.php';
+
+add_action( 'init', 'multisite_change_tax_terms_table', 0 );
+add_action( 'switch_blog', 'multisite_change_tax_terms_table', 0 );
+function multisite_change_tax_terms_table()
+{
+    global $wpdb;
+    $wpdb->terms = $wpdb->base_prefix . 'terms';
+    $wpdb->term_taxonomy = $wpdb->base_prefix . 'term_taxonomy';
+}
+
