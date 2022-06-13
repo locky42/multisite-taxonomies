@@ -14,7 +14,7 @@ function add_multisite_taxonomies()
                 'all_items' => __( 'All ' . $multisite_taxonomy['plural_label']),
                 'menu_name' => __($multisite_taxonomy['singular_label']),
             );
-            register_taxonomy($multisite_taxonomy['slug'], ['post'], array(
+            register_taxonomy($multisite_taxonomy['slug'], $multisite_taxonomy['postTypes'], array(
                 'hierarchical' => false,
                 'labels' => $labels,
                 'show_ui' => true,
