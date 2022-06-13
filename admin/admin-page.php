@@ -15,7 +15,7 @@ function multisite_taxonomies_settings_init()
         'multisite_taxonomies'
     );
     add_settings_field(
-        'multisite_taxonomies_1',
+        'multisite_taxonomies',
         __( 'Taxonomies', 'multisite_taxonomies' ),
         'multisite_taxonomies_repeatable_meta_box_callback',
         'multisite_taxonomies',
@@ -30,14 +30,13 @@ function multisite_taxonomies_options_page()
 { ?>
     <form method="post" action="/wp-admin/network/edit.php?action=multisite_taxonomies">
     <?php
-        settings_fields( 'multisite_taxonomies' );
-        do_settings_sections( 'multisite_taxonomies' );
+        settings_fields('multisite_taxonomies');
+        do_settings_sections('multisite_taxonomies');
         submit_button();
         ?>
     </form>
     <?php
 }
-
 
 add_action('admin_init', 'taxonomies_repeater_meta_boxes', 2);
 
@@ -54,30 +53,48 @@ function taxonomies_repeater_meta_boxes() {
 function multisite_taxonomies_repeatable_meta_box_callback()
 {
     $multisite_taxonomies = get_option('multisite_taxonomies');
+    $postTypes = get_post_types(['public' => true]);
     wp_nonce_field( 'repeaterBox', 'formType' );
     ?>
     <script type="text/javascript">
         jQuery(document).ready(function( $ ){
-            $( '#add-row' ).on('click', function() {
-                var row = $( '.empty-row.custom-repeater-text' ).clone(true);
-                row.removeClass( 'empty-row custom-repeater-text' ).css('display','table-row');
-                row.insertBefore( '#repeatable-fieldset-one tbody>tr:last' );
+            $('#add-row').on('click', function() {
+                var row = $('.empty-row.custom-repeater-text').clone(true);
+                row.removeClass('empty-row custom-repeater-text').css('display','table-row');
+                row.insertBefore('#repeatable-fieldset-one tbody>tr:last');
+                resetAttributes();
                 return false;
             });
 
-            $( '.remove-row' ).on('click', function() {
+            $('.remove-row').on('click', function() {
                 $(this).closest('tr').remove();
+                resetAttributes();
                 return false;
             });
-        });
 
+            function resetAttributes()
+            {
+                let fieldsets = $('fieldset');
+                $(fieldsets).each(function (index) {
+                    if (index < fieldsets.length -1) {
+                        $(this).find('input').each(function () {
+                            $(this).attr('id', $(this).attr('value') + '-' + index);
+                            $(this).attr('name', 'post_types[' + index + '][]');
+                        });
+                        $(this).find('label').each(function () {
+                            $(this).attr('for', $(this).data('type') + '-' + index);
+                        });
+                    }
+                });
+            }
+        });
     </script>
 
     <table id="repeatable-fieldset-one" width="100%" class="form-table">
         <tbody>
         <?php
         if ($multisite_taxonomies):
-            foreach ($multisite_taxonomies as $field): ?>
+            foreach ($multisite_taxonomies as $iteration => $field): ?>
                 <tr>
                     <td>
                         <label><?= __('Taxonomy slug'); ?></label>
@@ -106,6 +123,21 @@ function multisite_taxonomies_repeatable_meta_box_callback()
                                 value="<?= $field['singular_label'] ? : ''; ?>"
                                 placeholder="<?= __('Singular Label'); ?>"
                         />
+
+                        <label><?= __('Post types'); ?></label>
+                        <fieldset>
+                            <?php foreach ($postTypes as $postType): ?>
+                                <div>
+                                    <input
+                                            type="checkbox"
+                                            id="<?= $postType; ?>-<?= $iteration; ?>"
+                                            name="post_types[<?= $iteration; ?>][]"
+                                            value="<?= $postType; ?>" <?= in_array($postType, $field['postTypes']) ? 'checked' : ''; ?>
+                                    >
+                                    <label for="<?= $postType; ?>-<?= $iteration; ?>" data-type="<?= $postType; ?>"><?= $postType; ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </fieldset>
                     </td>
                     <td>
                         <a class="button remove-row" href="#1">
@@ -126,6 +158,16 @@ function multisite_taxonomies_repeatable_meta_box_callback()
 
                     <label><?= __('Singular Label'); ?></label>
                     <input type="text" style="width:98%; margin: 0.5em 0;" name="tax_singular_label[]" value="" placeholder="<?= __('Singular Label'); ?>" />
+
+                    <label><?= __('Post types'); ?></label>
+                    <fieldset>
+                        <?php foreach ($postTypes as $postType): ?>
+                            <div>
+                                <input type="checkbox" id="<?= $postType; ?>-0" name="post_types[0][]" value="<?= $postType; ?>">
+                                <label for="<?= $postType; ?>-0" data-type="<?= $postType; ?>"><?= $postType; ?></label>
+                            </div>
+                        <?php endforeach; ?>
+                    </fieldset>
                 </td>
                 <td>
                     <a class="button  cmb-remove-row-button button-disabled" href="#">
@@ -144,6 +186,16 @@ function multisite_taxonomies_repeatable_meta_box_callback()
 
                 <label><?= __('Singular Label'); ?></label>
                 <input type="text" style="width:98%; margin: 0.5em 0;" name="tax_singular_label[]" value="" placeholder="<?= __('Singular Label'); ?>" />
+
+                <label><?= __('Post types'); ?></label>
+                <fieldset>
+                    <?php foreach ($postTypes as $postType): ?>
+                        <div>
+                            <input type="checkbox" id="<?= $postType; ?>" name="post_types[][]" value="<?= $postType; ?>">
+                            <label for="<?= $postType; ?>" data-type="<?= $postType; ?>"><?= $postType; ?></label>
+                        </div>
+                    <?php endforeach; ?>
+                </fieldset>
             </td>
             <td>
                 <a class="button remove-row" href="#">
@@ -172,6 +224,7 @@ function taxonomies_save()
                 'slug' => $tax_slug,
                 'plural_label' => $_POST['tax_plural_label'][$key],
                 'singular_label' => $_POST['tax_singular_label'][$key],
+                'postTypes' => $_POST['post_types'][$key]
             ];
         }
     }

@@ -20,3 +20,4 @@ define('MST_PLUGIN', __FILE__);
 define('MST_PLUGIN_DIR', untrailingslashit(dirname(MST_PLUGIN)));
 
 include MST_PLUGIN_DIR . '/admin/init.php';
+include MST_PLUGIN_DIR . '/taxonomies.php';
