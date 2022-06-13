@@ -4,7 +4,7 @@ add_action('init', 'add_multisite_taxonomies', 100000);
 
 function add_multisite_taxonomies()
 {
-    $multisite_taxonomies = get_option('multisite_taxonomies');
+    $multisite_taxonomies = get_site_option('multisite_taxonomies');
     if ($multisite_taxonomies && !empty($multisite_taxonomies)) {
         foreach ($multisite_taxonomies as $multisite_taxonomy) {
             $labels = array(

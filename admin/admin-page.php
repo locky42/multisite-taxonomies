@@ -52,7 +52,7 @@ function taxonomies_repeater_meta_boxes() {
  */
 function multisite_taxonomies_repeatable_meta_box_callback()
 {
-    $multisite_taxonomies = get_option('multisite_taxonomies');
+    $multisite_taxonomies = get_site_option('multisite_taxonomies');
     $postTypes = get_post_types(['public' => true]);
     wp_nonce_field( 'repeaterBox', 'formType' );
     ?>
@@ -231,12 +231,12 @@ function taxonomies_save()
 
     wp_cache_set('notoptions', $taxonomies, 'options');
 
-    $multisite_taxonomies = get_option('multisite_taxonomies');
+    $multisite_taxonomies = get_site_option('multisite_taxonomies');
 
     if ($multisite_taxonomies) {
-        update_option('multisite_taxonomies', $taxonomies, true);
+        update_site_option('multisite_taxonomies', $taxonomies);
     } else {
-        add_option('multisite_taxonomies', $taxonomies, '', true);
+        add_site_option('multisite_taxonomies', $taxonomies);
     }
 
     wp_redirect($wp_http_referer);
