@@ -38,15 +38,6 @@ function multisite_taxonomies_options_page()
     <?php
 }
 
-add_action('admin_init', 'taxonomies_repeater_meta_boxes', 2);
-
-/**
- * @return void
- */
-function taxonomies_repeater_meta_boxes() {
-    add_meta_box( 'taxonomy-repeater-data', 'Taxonomy Repeater', 'multisite_taxonomies_repeatable_meta_box_callback', 'post', 'normal');
-}
-
 /**
  * @return void
  */
