@@ -3,7 +3,7 @@
  * Plugin Name: Multisite Taxonomies
  * Plugin URI: https://github.com/locky42/multisite-taxonomies
  * Description: Create taxonomies for multisite
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Zinchenko Maxym
  * Author URI: https://github.com/locky42
  * License: WTFPL
