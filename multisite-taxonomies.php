@@ -9,7 +9,7 @@
  * License: WTFPL
  * License URI: http://www.wtfpl.net/
  *
- * Network:     true
+ * Network: true
  */
 
 if(!defined('ABSPATH')) exit;
@@ -25,20 +25,12 @@ include_once MST_PLUGIN_DIR . '/functions/functions.php';
 include_once MST_PLUGIN_DIR . '/helpers/DBHelper.php';
 include_once MST_PLUGIN_DIR . '/classes/updater.php';
 
-if (is_admin()) { // note the use of is_admin() to double check that this is happening in the admin
-    $config = array(
-        'slug' => plugin_basename(__FILE__), // this is the slug of your plugin
-        'proper_folder_name' => 'plugin-name', // this is the name of the folder your plugin lives in
-        'api_url' => 'https://api.github.com/repos/locky42/multisite-taxonomies', // the github API url of your github repo
-        'raw_url' => 'https://api.github.com/repos/locky42/multisite-taxonomies/main', // the github raw url of your github repo
-        'github_url' => 'https://github.com/locky42/multisite-taxonomies', // the github url of your github repo
-        'zip_url' => 'https://github.com/locky42/multisite-taxonomies/zipball/main', // the zip url of the github repo
-        'sslverify' => true, // wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
-        'requires' => '5.0', // which version of WordPress does your plugin require?
-        'tested' => '6.0', // which version of WordPress is your plugin tested up to?
-        'readme' => 'README.md' // which file to use as the readme for the version number
-    );
-    new WPGitHubUpdater($config);
+if (is_admin()) { // note the use of is_admin() to double-check that this is happening in the admin
+    $parts = explode('/', $_SERVER['SCRIPT_NAME']);
+    // check only if is plugin page in multisite admin panel
+    if (in_array(array_pop($parts), ['plugins.php', 'plugin-install.php', 'update.php']) && array_pop($parts) == 'network') {
+        new WPGitHubUpdater(__FILE__, 'locky42', 'multisite-taxonomies');
+    }
 }
 
 add_action( 'init', 'multisite_change_tax_terms_table', 0 );
