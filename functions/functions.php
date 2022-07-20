@@ -40,3 +40,10 @@ function mtax_check_tables()
         DBHelper::cloneOriginalTable($wpdb->term_taxonomy, $charset_collate);
     }
 }
+
+function mtax_change_current_table()
+{
+    global $wpdb;
+    $wpdb->terms = $wpdb->base_prefix . 'terms';
+    $wpdb->term_taxonomy = $wpdb->base_prefix . 'term_taxonomy';
+}
