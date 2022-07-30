@@ -12,4 +12,13 @@ function multisite_taxonomies_admin_menus() {
         'multisite_taxonomies_options_page',
         MST_PLUGIN_URL . '/assets/logo.png'
     );
+    add_submenu_page(
+        'multisite_taxonomies',
+        'Multisite Taxonomies Fields',
+        'MTax Fields',
+        'multisite_taxonomies_fields',
+        'multisite_taxonomies_fields',
+        'multisite_taxonomies_fields_page',
+        MST_PLUGIN_URL . '/assets/logo.png'
+    );
 }
