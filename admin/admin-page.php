@@ -21,6 +21,19 @@ function multisite_taxonomies_settings_init()
         'multisite_taxonomies',
         'multisite_taxonomies_section'
     );
+    add_settings_section(
+        'multisite_taxonomies_fields',
+        __('Multisite taxonomies fields', 'multisite_taxonomies_fields'),
+        null,
+        'multisite_taxonomies_fields'
+    );
+    add_settings_field(
+        'multisite_taxonomies',
+        __( 'Taxonomies', 'multisite_taxonomies' ),
+        'multisite_taxonomies_fields_repeatable_meta_box_callback',
+        'multisite_taxonomies_fields',
+        'multisite_taxonomies_fields'
+    );
 }
 
 /**
@@ -37,6 +50,141 @@ function multisite_taxonomies_options_page()
     </form>
     <?php
 }
+
+/**
+ * @return void
+ */
+function multisite_taxonomies_fields_page()
+{ ?>
+    <form method="post" action="/wp-admin/network/edit.php?action=multisite_taxonomies">
+        <?php
+        settings_fields('multisite_taxonomies_fields');
+        do_settings_sections('multisite_taxonomies_fields');
+        submit_button();
+        ?>
+    </form>
+    <?php
+}
+
+function multisite_taxonomies_fields_repeatable_meta_box_callback()
+{
+    $multisite_taxonomies = get_site_option('multisite_taxonomies'); ?>
+    <script type="text/javascript">
+        jQuery(document).ready(function( $ ){
+            $('#add-row').on('click', function() {
+                var row = $('.empty-row.custom-repeater-text').clone(true);
+                row.removeClass('empty-row custom-repeater-text').css('display','table-row');
+                console.log($(event.target).closest('table').find('tbody:last'));
+                console.log(row);
+                $(event.target).closest('table').find('tbody:last').append(row);
+                resetAttributes();
+                return false;
+            });
+
+            $('.remove-row').on('click', function() {
+                $(this).closest('tr').remove();
+                resetAttributes();
+                return false;
+            });
+
+            function resetAttributes()
+            {
+                let fieldsets = $('fieldset');
+                $(fieldsets).each(function (index) {
+                    if (index < fieldsets.length -1) {
+                        $(this).find('input').each(function () {
+                            $(this).attr('id', $(this).attr('value') + '-' + index);
+                            $(this).attr('name', 'post_types[' + index + '][]');
+                        });
+                        $(this).find('label').each(function () {
+                            $(this).attr('for', $(this).data('type') + '-' + index);
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+    <?php if ($multisite_taxonomies):
+        foreach ($multisite_taxonomies as $iteration => $multisite_taxonomy): ?>
+        <table id="repeatable-fieldset-one" width="100%" class="form-table">
+            <tbody>
+                <tr>
+                    <td>
+                        <h3><?= $multisite_taxonomy['singular_label'] ?></h3>
+                    </td>
+                    <td>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <label><?= __('Field slug'); ?></label>
+                                        <input
+                                                type="text"
+                                                style="width:98%; margin: 0.5em 0;"
+                                                name="field_slug[]"
+                                                value=""
+                                                placeholder="<?= __('Field slug'); ?>"
+                                        />
+                                    </td>
+                                    <td>
+                                        <label><?= __('Field name'); ?></label>
+                                        <input
+                                                type="text"
+                                                style="width:98%; margin: 0.5em 0;"
+                                                name="field_name[]"
+                                                value=""
+                                                placeholder="<?= __('Field name'); ?>"
+                                        />
+                                    </td>
+                                    <td>
+                                        <a class="button remove-row" href="#" style="margin-top: 1.5em;">
+                                            <?= __('Remove'); ?>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p><a id="add-row" class="button" href="#"><?= __('Add field'); ?></a></p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php endforeach; ?>
+    <?php endif; ?>
+    <td>
+        <tr class="empty-row custom-repeater-text" style="display: none">
+            <td>
+                <label><?= __('Field slug'); ?></label>
+                <input
+                        type="text"
+                        style="width:98%; margin: 0.5em 0;"
+                        name="field_slug[]"
+                        value=""
+                        placeholder="<?= __('Field slug'); ?>"
+                />
+            </td>
+            <td>
+                <label><?= __('Field name'); ?></label>
+                <input
+                        type="text"
+                        style="width:98%; margin: 0.5em 0;"
+                        name="field_name[]"
+                        value=""
+                        placeholder="<?= __('Field name'); ?>"
+                />
+            </td>
+            <td>
+                <a class="button remove-row" href="#" style="margin-top: 1.5em;">
+                    <?= __('Remove'); ?>
+                </a>
+            </td>
+        </tr>
+    </td>
+<?php }
 
 /**
  * @return void
